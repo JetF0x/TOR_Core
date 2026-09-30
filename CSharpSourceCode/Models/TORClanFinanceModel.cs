@@ -54,6 +54,7 @@ namespace TOR_Core.Models
 
             var num = base.CalculateClanGoldChange(clan, includeDescriptions, applyWithdrawals, includeDetails);
             AddCareerPerkBenefits(clan, ref num);
+            AddTeefBagIncome(clan, ref num);
 
             if (num.ResultNumber < 0 && clan.Kingdom != null && clan != Clan.PlayerClan && !clan.IsMinorFaction && clan.Gold < 200000)
             {
@@ -92,6 +93,7 @@ namespace TOR_Core.Models
         {
             var income = base.CalculateClanIncome(clan, includeDescriptions, applyWithdrawals, includeDetails);
             AddCareerPerkBenefits(clan, ref income);
+            AddTeefBagIncome(clan, ref income);
 
             var num = CalculateClanGoldChange(clan, includeDescriptions, applyWithdrawals);
             var cheat = num.GetLines().Where(x => x.name == _cheatGoldAdjustmentName);
@@ -107,26 +109,29 @@ namespace TOR_Core.Models
                     ServeAsAHirelingHelpers.AddHirelingWage(Hero.MainHero, ref income);
                 }
 
-                if (Hero.MainHero.Culture.StringId == TORConstants.Cultures.GREENSKIN)
-                {
-                    var playerSettlements = clan.Fiefs.WhereQ(x => x.Settlement.Owner == Hero.MainHero && x.Settlement.IsGreenskinCamp());
-                    var teefBagGold = 0;
-                    foreach (var fief in playerSettlements)
-                    {
-                        var teefBagElement = fief.Settlement.Stash.FirstOrDefaultQ(x => x.EquipmentElement.Item?.StringId == "tor_gs_teef_bag");
-                        if (teefBagElement.EquipmentElement.Item != null)
-                        {
-                            teefBagGold += teefBagElement.Amount * 10;
-                        }
-                    }
-                    if (teefBagGold > 0)
-                    {
-                        income.Add(teefBagGold, new TextObject("Teef Bags"));
-                    }
-                }
             }
 
             return income;
+        }
+
+        private void AddTeefBagIncome(Clan clan, ref ExplainedNumber income)
+        {
+            if (Hero.MainHero.Clan != clan || Hero.MainHero.Culture.StringId != TORConstants.Cultures.GREENSKIN) return;
+
+            var playerSettlements = clan.Fiefs.WhereQ(x => x.Settlement.Owner == Hero.MainHero && x.Settlement.IsGreenskinCamp());
+            var teefBagGold = 0;
+            foreach (var fief in playerSettlements)
+            {
+                var teefBagElement = fief.Settlement.Stash.FirstOrDefaultQ(x => x.EquipmentElement.Item?.StringId == "tor_gs_teef_bag");
+                if (teefBagElement.EquipmentElement.Item != null)
+                {
+                    teefBagGold += teefBagElement.Amount * 10;
+                }
+            }
+            if (teefBagGold > 0)
+            {
+                income.Add(teefBagGold, new TextObject("Teef Bags"));
+            }
         }
 
         private void AddCareerPerkBenefits(Clan clan, ref ExplainedNumber income)
