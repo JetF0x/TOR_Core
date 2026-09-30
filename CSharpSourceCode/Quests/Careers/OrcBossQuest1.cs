@@ -13,6 +13,8 @@ namespace TOR_Core.Quests.Careers
 {
     public class OrcBossQuest1 : QuestBase
     {
+        private TORCampaignEvents _customEventPublisher;
+
         // Quest requirements constants
         private const int RequiredWeaponSkillLevels = 125;
         private const int RequiredBattlesWon = 50;
@@ -124,6 +126,8 @@ namespace TOR_Core.Quests.Careers
         protected override void RegisterEvents()
         {
             base.RegisterEvents();
+            UnregisterCustomEvents();
+            _customEventPublisher = TORCampaignEvents.Instance;
 
             // Skill tracking
             CampaignEvents.HeroGainedSkill.AddNonSerializedListener(this, OnSkillIncreased);
@@ -133,10 +137,10 @@ namespace TOR_Core.Quests.Careers
             CampaignEvents.MapEventEnded.AddNonSerializedListener(this, OnClanOrKingdomBattleEnded);
 
             // Custom TOR events
-            TORCampaignEvents.Instance.BrawlWon += OnBrawlWon;
-            TORCampaignEvents.Instance.TournamentWon += OnTournamentWon;
-            TORCampaignEvents.Instance.TeefTransferred += OnTeefTransferred;
-            TORCampaignEvents.Instance.PracticeFightWon += OnPracticeFightWon;
+            _customEventPublisher.BrawlWon += OnBrawlWon;
+            _customEventPublisher.TournamentWon += OnTournamentWon;
+            _customEventPublisher.TeefTransferred += OnTeefTransferred;
+            _customEventPublisher.PracticeFightWon += OnPracticeFightWon;
         }
 
         private void OnSkillIncreased(Hero hero, SkillObject skill, int skillValueBefore, bool arg4)
@@ -268,12 +272,20 @@ namespace TOR_Core.Quests.Careers
 
         public override bool IsRemainingTimeHidden => true;
 
-        ~OrcBossQuest1()
+        protected override void OnFinalize()
         {
-            TORCampaignEvents.Instance.BrawlWon -= OnBrawlWon;
-            TORCampaignEvents.Instance.TournamentWon -= OnTournamentWon;
-            TORCampaignEvents.Instance.TeefTransferred -= OnTeefTransferred;
-            TORCampaignEvents.Instance.PracticeFightWon -= OnPracticeFightWon;
+            UnregisterCustomEvents();
+            base.OnFinalize();
+        }
+
+        private void UnregisterCustomEvents()
+        {
+            if (_customEventPublisher == null) return;
+            _customEventPublisher.BrawlWon -= OnBrawlWon;
+            _customEventPublisher.TournamentWon -= OnTournamentWon;
+            _customEventPublisher.TeefTransferred -= OnTeefTransferred;
+            _customEventPublisher.PracticeFightWon -= OnPracticeFightWon;
+            _customEventPublisher = null;
         }
     }
 }

@@ -13,6 +13,8 @@ namespace TOR_Core.Quests.Careers
 {
     public class OrcShamanQuest1 : QuestBase
     {
+        private TORCampaignEvents _customEventPublisher;
+
         // Quest requirements constants
         private const int RequiredSpellcraftSkillLevels = 150;
         private const int RequiredFaithSkillLevels = 100;
@@ -115,17 +117,19 @@ namespace TOR_Core.Quests.Careers
         protected override void RegisterEvents()
         {
             base.RegisterEvents();
+            UnregisterCustomEvents();
+            _customEventPublisher = TORCampaignEvents.Instance;
 
             // Shrine prayer tracking
-            TORCampaignEvents.Instance.ShrinePrayer += OnShrinePrayer;
+            _customEventPublisher.ShrinePrayer += OnShrinePrayer;
 
             // Skill tracking (only matters after shrine prayer)
             CampaignEvents.HeroGainedSkill.AddNonSerializedListener(this, OnSkillIncreased);
 
             // Custom TOR events
-            TORCampaignEvents.Instance.TeefTransferred += OnTeefTransferred;
-            TORCampaignEvents.Instance.EnchantmentLearned += OnEnchantmentLearned;
-            TORCampaignEvents.Instance.ShrineLooted += OnShrineLooted;
+            _customEventPublisher.TeefTransferred += OnTeefTransferred;
+            _customEventPublisher.EnchantmentLearned += OnEnchantmentLearned;
+            _customEventPublisher.ShrineLooted += OnShrineLooted;
         }
 
         private void OnShrinePrayer(object sender, ShrinePrayerEventArgs e)
@@ -247,12 +251,20 @@ namespace TOR_Core.Quests.Careers
 
         public override bool IsRemainingTimeHidden => true;
 
-        ~OrcShamanQuest1()
+        protected override void OnFinalize()
         {
-            TORCampaignEvents.Instance.ShrinePrayer -= OnShrinePrayer;
-            TORCampaignEvents.Instance.TeefTransferred -= OnTeefTransferred;
-            TORCampaignEvents.Instance.EnchantmentLearned -= OnEnchantmentLearned;
-            TORCampaignEvents.Instance.ShrineLooted -= OnShrineLooted;
+            UnregisterCustomEvents();
+            base.OnFinalize();
+        }
+
+        private void UnregisterCustomEvents()
+        {
+            if (_customEventPublisher == null) return;
+            _customEventPublisher.ShrinePrayer -= OnShrinePrayer;
+            _customEventPublisher.TeefTransferred -= OnTeefTransferred;
+            _customEventPublisher.EnchantmentLearned -= OnEnchantmentLearned;
+            _customEventPublisher.ShrineLooted -= OnShrineLooted;
+            _customEventPublisher = null;
         }
     }
 }
