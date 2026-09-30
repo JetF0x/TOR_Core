@@ -26,7 +26,7 @@ namespace TOR_Core.CampaignMechanics.Menagery
         private bool _knowsPlayer;
         private bool _receivedDemiGryphen;
         private List<string> _constructedBuildings = new List<string>();
-        private readonly List<string> _politicalPowerProjects = new List<string>();
+        private List<string> _politicalPowerProjects = new List<string>();
 
         public override void RegisterEvents()
         {
@@ -385,7 +385,7 @@ namespace TOR_Core.CampaignMechanics.Menagery
             dataStore.SyncData("_knowsPlayer", ref _knowsPlayer);
             dataStore.SyncData("_receivedDemiGryphen", ref _receivedDemiGryphen);
             dataStore.SyncData("_constructedBuildings", ref _constructedBuildings);
-            dataStore.SyncData("_politicalPowerProjects", ref _constructedBuildings);
+            dataStore.SyncData("_politicalPowerProjects", ref _politicalPowerProjects);
         }
     }
 }
