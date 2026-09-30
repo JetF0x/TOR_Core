@@ -196,6 +196,8 @@ namespace TOR_Core.Quests.Careers
 
         private void OnMapEventEnded(MapEvent mapEvent)
         {
+            if (!mapEvent.HasWinner || mapEvent.WinningSide != mapEvent.PlayerSide) return;
+
             _currentBattlesWon++;
             _taskBattlesWon.UpdateCurrentProgress(_currentBattlesWon);
             UpdateQuest();
