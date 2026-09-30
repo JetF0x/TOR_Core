@@ -337,23 +337,23 @@ namespace TOR_Core.CampaignMechanics
                 party.AddMember(upgradeArgs.UpgradeSource, -possibleUpgradeCount, 0);
                 party.AddMember(upgradeArgs.UpgradeTarget, possibleUpgradeCount, 0);
 
-                ApplyEffects(party, upgradeArgs);
+                ApplyEffects(party, upgradeArgs, possibleUpgradeCount);
             }
         }
 
-        private void ApplyEffects(PartyBase party, TORTroopUpgradeArgs upgradeArgs)
+        private void ApplyEffects(PartyBase party, TORTroopUpgradeArgs upgradeArgs, int upgradedCount)
         {
             //testing paying gold costs now that I fixed the upgrade costs and check for payable wages
             if (party.Owner != null && party.Owner.IsAlive)
             {
-                SkillLevelingManager.OnUpgradeTroops(party, upgradeArgs.UpgradeSource, upgradeArgs.UpgradeTarget, upgradeArgs.PossibleUpgradeCount);
-                GiveGoldAction.ApplyBetweenCharacters(party.Owner, null, upgradeArgs.UpgradeGoldCost * upgradeArgs.PossibleUpgradeCount, true);
+                SkillLevelingManager.OnUpgradeTroops(party, upgradeArgs.UpgradeSource, upgradeArgs.UpgradeTarget, upgradedCount);
+                GiveGoldAction.ApplyBetweenCharacters(party.Owner, null, upgradeArgs.UpgradeGoldCost * upgradedCount, true);
                 return;
             }
             if (party.LeaderHero != null && party.LeaderHero.IsAlive)
             {
-                SkillLevelingManager.OnUpgradeTroops(party, upgradeArgs.UpgradeSource, upgradeArgs.UpgradeTarget, upgradeArgs.PossibleUpgradeCount);
-                GiveGoldAction.ApplyBetweenCharacters(party.LeaderHero, null, upgradeArgs.UpgradeGoldCost * upgradeArgs.PossibleUpgradeCount, true);
+                SkillLevelingManager.OnUpgradeTroops(party, upgradeArgs.UpgradeSource, upgradeArgs.UpgradeTarget, upgradedCount);
+                GiveGoldAction.ApplyBetweenCharacters(party.LeaderHero, null, upgradeArgs.UpgradeGoldCost * upgradedCount, true);
             }
         }
 
