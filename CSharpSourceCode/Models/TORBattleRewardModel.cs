@@ -88,15 +88,15 @@ namespace TOR_Core.Models
             return mapEvent.MapEventSettlement?.SiegeEvent != null;
         }
 
-        //does this have the same effect as the commented out method below (it no longer exists)?
-        //We are trying to prevent AI from saving prisoners as members to cultural mismatch and slowing down parties.
+        // Prevent AI parties from rescuing prisoners as members, which can introduce
+        // cultural mismatches and slow their parties. Preserve the player's native share.
         public override MBReadOnlyList<KeyValuePair<MapEventParty, float>> GetLootPrisonerChances(MBReadOnlyList<MapEventParty> winnerParties, TroopRosterElement prisonerElement)
         {
             var baseResult = base.GetLootPrisonerChances(winnerParties, prisonerElement);
             var result = new MBReadOnlyList<KeyValuePair<MapEventParty, float>>();
             foreach (var kvp in baseResult)
             {
-                result.Add(new KeyValuePair<MapEventParty, float>(kvp.Key, 0f));
+                result.Add(new KeyValuePair<MapEventParty, float>(kvp.Key, kvp.Key.Party == PartyBase.MainParty ? kvp.Value : 0f));
             }
             return result;
         }
