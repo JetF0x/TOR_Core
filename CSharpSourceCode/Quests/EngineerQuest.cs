@@ -121,6 +121,7 @@ namespace TOR_Core.Quests
         private void QuestBattleEnded(MapEvent mapEvent)
         {
             if (!mapEvent.IsPlayerMapEvent || !mapEvent.IsFieldBattle) return;
+            if (!mapEvent.HasWinner || mapEvent.WinningSide != mapEvent.PlayerSide) return;
             if (mapEvent.PartiesOnSide(mapEvent.PlayerSide.GetOppositeSide())
                 .Any(party => party.Party.MobileParty == _targetParty))
             {
