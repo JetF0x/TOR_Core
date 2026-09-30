@@ -73,6 +73,7 @@ namespace TOR_Core
         private static int _num = -1;
         private static bool ENABLECOPYSHADERS = true;
         public static Harmony HarmonyInstance { get; private set; }
+        private static Harmony _latePatchesHarmonyInstance;
 
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
         {
@@ -212,7 +213,11 @@ namespace TOR_Core
 
         public override void OnGameInitializationFinished(Game game)
         {
-            HarmonyInstance.PatchCategory("LatePatches");//Sly : Campaign.OnInitialize starts the cascade that reaches this method; if each time a campaign is started/loaded this is patched, will we end up patching a given method multiple times?
+            var harmony = HarmonyInstance;
+            if (harmony != null && ReferenceEquals(_latePatchesHarmonyInstance, harmony)) return;
+
+            harmony.PatchCategory("LatePatches");
+            _latePatchesHarmonyInstance = harmony;
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
