@@ -15,6 +15,8 @@ namespace TOR_Core.Quests;
 
 public class RunelordQuest : QuestBase
 {
+    private TORCampaignEvents _customEventPublisher;
+
     [SaveableField(1)]
     private JournalLog _task1 = null;
     [SaveableField(2)]
@@ -77,10 +79,12 @@ public class RunelordQuest : QuestBase
     protected override void RegisterEvents()
     {
         base.RegisterEvents();
+        UnregisterCustomEvents();
+        _customEventPublisher = TORCampaignEvents.Instance;
         CampaignEvents.OnCraftingOrderCompletedEvent.AddNonSerializedListener(this, CraftingOrderCompleted);
-        TORCampaignEvents.Instance.EnchantmentLearned += RuneLearned;
-        TORCampaignEvents.Instance.AbilityLearned += AbilityLearned;
-        TORCampaignEvents.Instance.OathLevelChanged += OathLevelChanged;
+        _customEventPublisher.EnchantmentLearned += RuneLearned;
+        _customEventPublisher.AbilityLearned += AbilityLearned;
+        _customEventPublisher.OathLevelChanged += OathLevelChanged;
     }
 
     private void OathLevelChanged(object sender, OathLevelChangedEventArgs e)
@@ -176,10 +180,18 @@ public class RunelordQuest : QuestBase
     public override bool IsRemainingTimeHidden => true;
 
 
-    ~RunelordQuest()
+    protected override void OnFinalize()
     {
-        TORCampaignEvents.Instance.EnchantmentLearned -= RuneLearned;
-        TORCampaignEvents.Instance.AbilityLearned -= AbilityLearned;
-        TORCampaignEvents.Instance.OathLevelChanged -= OathLevelChanged;
+        UnregisterCustomEvents();
+        base.OnFinalize();
+    }
+
+    private void UnregisterCustomEvents()
+    {
+        if (_customEventPublisher == null) return;
+        _customEventPublisher.EnchantmentLearned -= RuneLearned;
+        _customEventPublisher.AbilityLearned -= AbilityLearned;
+        _customEventPublisher.OathLevelChanged -= OathLevelChanged;
+        _customEventPublisher = null;
     }
 }

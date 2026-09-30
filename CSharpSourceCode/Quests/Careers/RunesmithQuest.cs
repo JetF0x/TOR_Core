@@ -14,6 +14,8 @@ namespace TOR_Core.Quests;
 
 public class RunesmithQuest : QuestBase
 {
+    private TORCampaignEvents _customEventPublisher;
+
     [SaveableField(1)]
     private JournalLog _task1 = null;
     [SaveableField(2)]
@@ -48,8 +50,10 @@ public class RunesmithQuest : QuestBase
     protected override void RegisterEvents()
     {
         base.RegisterEvents();
+        UnregisterCustomEvents();
+        _customEventPublisher = TORCampaignEvents.Instance;
         CampaignEvents.OnCraftingOrderCompletedEvent.AddNonSerializedListener(this, CraftingOrderCompleted);
-        TORCampaignEvents.Instance.EnchantmentLearned += RuneLearned;
+        _customEventPublisher.EnchantmentLearned += RuneLearned;
     }
 
     private void RuneLearned(object sender, EnchantmentLearnedEventArgs enchantmentLearnedEventArgs)
@@ -110,9 +114,17 @@ public class RunesmithQuest : QuestBase
     public override bool IsRemainingTimeHidden => true;
 
 
-    ~RunesmithQuest()
+    protected override void OnFinalize()
     {
-        TORCampaignEvents.Instance.EnchantmentLearned -= RuneLearned;
+        UnregisterCustomEvents();
+        base.OnFinalize();
+    }
+
+    private void UnregisterCustomEvents()
+    {
+        if (_customEventPublisher == null) return;
+        _customEventPublisher.EnchantmentLearned -= RuneLearned;
+        _customEventPublisher = null;
     }
 
 }
