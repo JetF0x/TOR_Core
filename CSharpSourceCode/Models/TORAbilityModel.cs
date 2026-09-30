@@ -962,8 +962,7 @@ namespace TOR_Core.Models
                     // Perk effects multiplier (includes Overcaster/EfficientSpellCaster)
                     healing *= GetPerkEffectsOnAbilityDamage(hero.CharacterObject, target, abilityTemplate);
 
-                    // Skill effectiveness for healing
-                    healing *= GetSkillEffectivenessForAbilityDamage(hero.CharacterObject, abilityTemplate);
+                    // Skill effectiveness is already applied in TriggeredEffect.Trigger().
                 }
             }
 
