@@ -373,7 +373,7 @@ namespace TOR_Core.Quests
             {
                 var quest2 = quest as EngineerQuest;
                 var party = quest2.TargetParty;
-                var leader = party.LeaderHero;
+                var leader = party?.LeaderHero;
                 if (leader != null && leader.IsSpecial && leader.CharacterObject.OriginalCharacter != null && leader.CharacterObject.OriginalCharacter.StringId == RogueEngineerLeaderTemplateId)
                 {
                     if (leader.IsNotSpawned)
