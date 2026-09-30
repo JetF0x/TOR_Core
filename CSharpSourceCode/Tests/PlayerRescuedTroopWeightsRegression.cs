@@ -56,7 +56,7 @@ internal static class PlayerRescuedTroopWeightsRegression
         var campaign = Uninitialized<Campaign>();
         var regular = Uninitialized<CharacterObject>();
         SetField(regular, "_occupation", Occupation.Soldier);
-        var prisoner = new TroopRosterElement(regular);
+        var prisoner = new TroopRosterElement(regular) { Number = 1 };
         var player = CreateWinner(regular, 2, true);
         var ai = CreateWinner(regular, 6, true);
         SetField(campaign, "<MainParty>k__BackingField", player.Party.MobileParty);
@@ -155,7 +155,7 @@ internal static class PlayerRescuedTroopWeightsRegression
         SetField(hero, "<Occupation>k__BackingField", Occupation.Lord);
         SetField(character, "_heroObject", hero);
         if (!character.IsHero) throw new Exception("The managed hero fixture did not match production getters.");
-        return new TroopRosterElement(character);
+        return new TroopRosterElement(character) { Number = 1 };
     }
 
     private static MBReadOnlyList<MapEventParty> Winners(params MapEventParty[] parties)
