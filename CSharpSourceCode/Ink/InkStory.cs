@@ -728,7 +728,7 @@ namespace TOR_Core.Ink
         {
             var troop = MBObjectManager.Instance.GetObject<CharacterObject>(troopId);
             int limit = MobileParty.MainParty.Party.PartySizeLimit;
-            int current = MobileParty.MainParty.MemberRoster.Count;
+            int current = MobileParty.MainParty.MemberRoster.TotalManCount;
             if (troop == null)
             {
                 TORCommon.Say(string.Format("ERROR, troop with ID: {0} does not exist!", troopId));
